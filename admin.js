@@ -233,57 +233,6 @@ function thumb(p, size) {
   const art = MP.motifArtwork(p, fab, size || 42, { code: false });
   return art;
 }
-function sparkPath(vals, w, h) {
-  const max = Math.max(...vals, 1);
-  const min = Math.min(...vals, 0);
-  const rng = (max - min) || 1;
-  const step = w / (vals.length - 1 || 1);
-  const pts = vals.map((v, i) => [i * step, h - ((v - min) / rng) * (h - 4) - 2]);
-  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
-  const area = line + ` L ${w} ${h} L 0 ${h} Z`;
-  return { line, area, pts };
-}
-function areaChart(vals, labels, w, h) {
-  const { line, area } = sparkPath(vals, w, h);
-  const max = Math.max(...vals, 1);
-  const dots = vals.map((v, i) => `<circle cx="${(i * w / (vals.length - 1 || 1)).toFixed(1)}" cy="${(h - (v / max) * (h - 14) - 7).toFixed(1)}" r="3" fill="#0e0e10" stroke="#e5c76b" stroke-width="2"/>`).join('');
-  const grid = [1, 3, 5].map(g => `<line x1="0" x2="${w}" y1="${(h * g / 6).toFixed(1)}" y2="${(h * g / 6).toFixed(1)}" stroke="#232329" stroke-dasharray="3 4"/>`).join('');
-  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="100%" preserveAspectRatio="none">
-    ${grid}${area ? `<path d="${area}" fill="url(#agrad-${w})" opacity=".5"/>` : ''}
-    <defs><linearGradient id="agrad-${w}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c9a227"/><stop offset="100%" stop-color="#c9a227" stop-opacity=".02"/></linearGradient></defs>
-    <path d="${line}" fill="none" stroke="#e5c76b" stroke-width="2" stroke-linecap="round"/>
-    ${dots}
-  </svg>`;
-}
-function barChart(items, w, h) {
-  const max = Math.max(...items.map(i => i.v), 1);
-  const n = items.length;
-  const bw = (w - 20) / n;
-  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="100%">
-    ${items.map((it, i) => {
-      const bH = Math.max(2, (it.v / max) * (h - 30));
-      const x = 10 + i * bw + bw * .22;
-      return `<rect x="${x}" y="${(h - 20 - bH).toFixed(1)}" width="${(bw * .56).toFixed(1)}" height="${bH.toFixed(1)}" rx="4" fill="url(#bgrad)"/>
-        <text x="${(x + bw * .28).toFixed(1)}" y="${(h - 7).toFixed(1)}" font-size="8" text-anchor="middle" fill="#8b8795">${esc(it.l)}</text>`;
-    }).join('')}
-    <defs><linearGradient id="bgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e5c76b"/><stop offset="100%" stop-color="#8a6d1c"/></linearGradient></defs>
-  </svg>`;
-}
-function donutChart(segments, size, gap) {
-  size = size || 160; gap = gap || 8;
-  const total = segments.reduce((s, x) => s + x.v, 0) || 1;
-  const r = (size / 2) - 14;
-  const C = 2 * Math.PI * r;
-  let off = 0;
-  const arcs = segments.map((s, i) => {
-    const len = (s.v / total) * C;
-    const dash = `${Math.max(0, len - gap)} ${C - Math.max(0, len - gap)}`;
-    const ret = `<circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${s.c}" stroke-width="18" stroke-dasharray="${dash}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 ${size / 2} ${size / 2})"/>`;
-    off += len;
-    return ret;
-  }).join('');
-  return `<svg viewBox="0 0 ${size} ${size}" width="100%" height="100%">${arcs}<circle cx="${size / 2}" cy="${size / 2}" r="${size / 4}" fill="#1a1a1e"/><text x="${size / 2}" y="${size / 2 + 5}" text-anchor="middle" font-family="Georgia, serif" font-size="17" font-weight="700" fill="#ece9e0">${fmt(total)}</text></svg>`;
-}
 
 /* ---------------- DASHBOARD ---------------- */
 function renderDashboard() {
@@ -291,70 +240,43 @@ function renderDashboard() {
   const revenue = ORDRS.filter(o => o.status === 'Paid').reduce((s, o) => s + Number(o.total || 0), 0);
   const pending = ORDRS.filter(o => o.status === 'Pending').length;
   const active = PRODUCTS.filter(p => p.status !== 'disabled').length;
-  const custEmails = new Set(ORDRS.map(o => (o.user || o.customer?.email || '').toLowerCase()).filter(Boolean));
-  const me = LS.get(K.AUTH, null);
-  if (me && me.email) custEmails.add(me.email.toLowerCase());
   const dlCount = LS.get(K.DOWNLOADS, []).length;
-  const weekRev = weeklyRevenue(ORDRS);
-  const statusCount = {};
-  ORDRS.forEach(o => { statusCount[o.status] = (statusCount[o.status] || 0) + 1; });
-  const topProducts = [...PRODUCTS].sort((a, b) => b.sales - a.sales).slice(0, 5);
-  const catDist = CATEGORIES.map(c => ({ l: c.id, v: PRODUCTS.filter(p => p.cat === c.id || p.sub === c.id).length })).filter(c => c.v > 0).sort((a, b) => b.v - a.v);
-  const deltas = [{ l: 'Revenue', v: INR(revenue), d: '+12.4%', up: true }, { l: 'Orders', v: fmt(ORDRS.length), d: `+${fmt(pending)} pending`, up: true }, { l: 'Active Designs', v: fmt(active), d: `${fmt(PRODUCTS.length - active)} paused`, up: false }, { l: 'Downloads', v: fmt(dlCount), d: '+8.1%', up: true }];
-  setSubtitle('Here\'s what\'s happening with your embroidery store.');
+  const deltas = [
+    { l: 'Revenue', v: INR(revenue), d: `${fmt(ORDRS.length)} orders`, up: true },
+    { l: 'Pending', v: fmt(pending), d: 'awaiting payment', up: pending > 0 },
+    { l: 'Active Designs', v: fmt(active), d: `${fmt(PRODUCTS.length)} total`, up: true },
+    { l: 'Downloads', v: fmt(dlCount), d: 'files delivered', up: true }
+  ];
+  setSubtitle('Welcome to your admin control center.');
   $('#app').innerHTML = `
   <div class="stack">
     <div class="stats-grid">
-      ${deltas.map((s, i) => `<div class="stat reveal in spark-${i}"><div class="lbl">${s.l}</div><div class="val">${s.v}</div><span class="delta ${s.up ? 'up' : 'dn'}">${s.d}</span><span class="spark">${sparkBtn(i)}</span></div>`).join('')}
-    </div>
-    <div class="charts-grid">
-      <div class="card"><h3>Revenue — last 12 weeks <span class="chip pill gold">${INR(weekRev.reduce((a, b) => a + b, 0))}</span></h3><div class="chart-box">${areaChart(weekRev, [], 580, 240)}</div></div>
-      <div class="card"><h3>Order status</h3><div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap"><div style="flex:1;min-width:150px">${donutChart(Object.entries(statusCount).map(([k, v]) => ({ v, c: statusColor(k) })), 160)}</div><div class="legend" style="flex-direction:column;gap:8px">${Object.entries(statusCount).map(([k, v]) => `<span><i style="background:${statusColor(k)}"></i>${k} · ${v}</span>`).join('')}</div></div></div>
+      ${deltas.map((s, i) => `<div class="stat reveal in spark-${i}"><div class="lbl">${s.l}</div><div class="val">${s.v}</div><span class="delta ${s.up ? 'up' : 'dn'}">${s.d}</span></div>`).join('')}
     </div>
     <div class="grid-main-side">
-      <div class="card"><h3>Recent orders <a href="#/admin/orders" style="font-size:.76rem;color:var(--gold);font-weight:700">View all →</a></h3>
-        <div class="table-wrap">${ordersTable(ORDRS.slice(-6).reverse(), ['id', 'cust', 'items', 'total', 'status', 'action'])}</div>
-      </div>
-      <div class="card"><h3>Top performers</h3><div class="chart-box" style="height:280px">${barChart(topProducts.map(p => ({ l: p.code.replace(/[^0-9]/g, ''), v: p.sales })), 320, 260)}</div></div>
-    </div>
-    <div class="grid-side-main">
-      <div class="card"><h3>Catalog by category</h3><div class="chart-box" style="height:260px">${barChart(catDist.slice(0, 8).map(c => ({ l: shortCat(c.l), v: c.v })), 360, 240)}</div></div>
       <div class="card"><h3>Quick actions</h3><div class="stack" style="gap:10px">
         <a class="btn btn-gold btn-block" href="#/admin/products/new">＋ Add a new design</a>
-        <a class="btn btn-dark btn-block" href="#/admin/orders">Review orders</a>
+        <a class="btn btn-dark btn-block" href="#/admin/orders">${pending > 0 ? '⚡' : ''} Review orders</a>
         <a class="btn btn-dark btn-block" href="#/admin/products">Manage catalog</a>
-        <a class="btn btn-outline btn-block" href="#/admin/settings">Update store settings</a>
+        <a class="btn btn-outline btn-block" href="#/admin/settings">Store settings</a>
       </div></div>
+      <div class="card"><h3>Recent activity</h3>${renderActivityFeed()}</div>
     </div>
   </div>`;
 }
-function sparkBtn(i) {
-  const pats = [[3, 5, 4, 7, 6, 9, 8, 11], [2, 4, 3, 6, 7, 5, 8, 9], [6, 7, 5, 8, 9, 11, 10, 12], [1, 3, 4, 2, 5, 7, 6, 8]];
-  const vals = pats[i % pats.length];
-  const w = 84, h = 26;
-  const { line } = sparkPath(vals, w, h);
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${line}" fill="none" stroke="${i % 2 ? '#8b8795' : '#c9a227'}" stroke-width="1.6" stroke-linecap="round"/></svg>`;
-}
-function statusColor(s) {
-  return ({ 'Paid': '#3f8c6a', 'Pending': '#c9a227', 'Refunded': '#a32727', 'Cancelled': '#c25454', 'Completed': '#5a6eb4' }[s]) || '#8b8795';
-}
-function weeklyRevenue(ORDRS) {
-  const weeks = Array(12).fill(0);
-  const now = Date.now();
-  const day = 864e5;
-  ORDRS.forEach(o => {
-    const t = new Date(o.date).getTime();
-    if (!t) return;
-    const wk = Math.floor((now - t) / (7 * day));
-    if (wk >= 0 && wk < 12 && o.status !== 'Refunded') weeks[11 - wk] += Number(o.total || 0);
-  });
-  return weeks.map(x => Math.round(x));
-}
-function shortCat(s) {
-  const c = CATEGORIES.find(c => c.id === s);
-  return c ? c.name.split(' ')[0] : s;
-}
 
+function renderActivityFeed() {
+  const ORDRS = orders().slice(-5).reverse();
+  if (!ORDRS.length) return '<div class="empty" style="padding:20px"><p style="color:var(--muted)">No activity yet. Orders will appear here.</p></div>';
+  return `<div class="table-wrap"><table class="tbl">
+    <tr><th>Time</th><th>Action</th><th>Details</th></tr>
+    ${ORDRS.map(o => `<tr>
+      <td>${o.date}</td>
+      <td><span class="pill ${statusPillCls(o.status)}">${o.status}</span></td>
+      <td>${o.customer?.name || o.user} · ${INR(o.total)} · ${o.items.map(i => i.name).join(', ')}</td>
+    </tr>`).join('')}
+  </table></div>`;
+}
 /* ---------------- PRODUCTS ---------------- */
 function renderProducts(q) {
   q = q || new URLSearchParams();
@@ -969,27 +891,23 @@ function editCoupon(i, custom) {
 /* ---------------- ANALYTICS ---------------- */
 function renderAnalytics() {
   const ORDRS = orders();
-  const weekRev = weeklyRevenue(ORDRS);
   const top = [...PRODUCTS].sort((a, b) => b.sales - a.sales).slice(0, 8);
   const catDist = CATEGORIES.map(c => ({ name: c.name, v: PRODUCTS.filter(p => p.cat === c.id || p.sub === c.id).length })).filter(c => c.v > 0).sort((a, b) => b.v - a.v);
   const byCatSales = CATEGORIES.map(c => ({ name: c.name, v: PRODUCTS.filter(p => p.cat === c.id || p.sub === c.id).reduce((s, p) => s + p.sales, 0) })).filter(c => c.v > 0).sort((a, b) => b.v - a.v);
   const aov = ORDRS.filter(o => o.status !== 'Refunded');
   const aovAvg = Math.round(aov.reduce((s, o) => s + Number(o.total || 0), 0) / Math.max(1, aov.length));
-  const conv = Math.min(99, Math.round((ORDRS.length / Math.max(1, LS.get(K.AUTH, null) ? 1 : 1)) * 100));
   setSubtitle('Store performance at a glance');
   $('#app').innerHTML = `
   <div class="section-t">Analytics</div><div class="section-s">Trends, top sellers and catalog depth.</div>
-  <div class="charts-grid">
-    <div class="card"><h3>Revenue trend <span class="chip pill gold">12 weeks</span></h3><div class="chart-box">${areaChart(weekRev, [], 580, 240)}</div></div>
-    <div class="card"><h3>Catalog by category</h3><div class="chart-box">${barChart(catDist.map(c => ({ l: c.name.split(' ')[0], v: c.v })), 320, 240)}</div></div>
-    <div class="card"><h3>Top sell-by-designs</h3><div class="chart-box">${barChart(top.map(p => ({ l: p.code.replace(/[^0-9]/g, ''), v: p.sales })), 580, 240)}</div></div>
-    <div class="card"><h3>Sales share by category</h3><div class="chart-box" style="height:240px;display:flex;align-items:center;gap:18px;flex-wrap:wrap"><div style="flex:1;min-width:150px">${donutChart(byCatSales.slice(0, 6).map((c, i) => ({ v: c.v, c: ['#c9a227', '#a32727', '#3f8c6a', '#5a6eb4', '#c25454', '#8b8795'][i % 6] })), 170)}</div><div class="legend" style="flex-direction:column;gap:7px">${byCatSales.slice(0, 6).map((c, i) => `<span><i style="background:${['#c9a227', '#a32727', '#3f8c6a', '#5a6eb4', '#c25454', '#8b8795'][i % 6]}"></i>${esc(c.name)}</span>`).join('')}</div></div></div>
+  <div class="stats-grid" style="margin-bottom:18px">
+    <div class="stat reveal in"><div class="lbl">Total revenue</div><div class="val">${INR(ORDRS.filter(o => o.status === 'Paid').reduce((s, o) => s + Number(o.total || 0), 0))}</div><span class="delta up">${fmt(ORDRS.filter(o => o.status === 'Paid').length)} paid orders</span></div>
+    <div class="stat reveal in"><div class="lbl">Average order value</div><div class="val">${INR(aovAvg)}</div><span class="delta up">${fmt(aov.length)} orders</span></div>
+    <div class="stat reveal in"><div class="lbl">Active designs</div><div class="val">${fmt(PRODUCTS.filter(p => p.status !== 'disabled').length)}</div><span class="delta up">${fmt(PRODUCTS.length)} total</span></div>
+    <div class="stat reveal in"><div class="lbl">Total stitches</div><div class="val">${fmt(PRODUCTS.reduce((s, p) => s + p.stitches, 0))}</div><span class="delta up">across catalog</span></div>
   </div>
-  <div class="stats-grid" style="margin-top:18px">
-    <div class="stat reveal in"><div class="lbl">Average order value</div><div class="val">${INR(aovAvg)}</div><span class="delta up">${fmt(ORDRS.length)} orders</span></div>
-    <div class="stat reveal in"><div class="lbl">Coupons active</div><div class="val">${fmt(SEED_COUPONS.length + LS.get(K.COUPONS, []).length)}</div><span class="delta up">checkout</span></div>
-    <div class="stat reveal in"><div class="lbl">Downloads granted</div><div class="val">${fmt(LS.get(K.DOWNLOADS, []).length)}</div><span class="delta up">digital</span></div>
-    <div class="stat reveal in"><div class="lbl">Stitch universe</div><div class="val">${fmt(PRODUCTS.reduce((s, p) => s + p.stitches, 0))}</div><span class="delta up">stitches</span></div>
+  <div class="grid-main-side">
+    <div class="card"><h3>Top selling designs</h3>${top.length ? `<div class="table-wrap"><table class="tbl"><tr><th>Design</th><th>Code</th><th>Category</th><th>Sales</th><th>Revenue</th></tr>${top.map(p => `<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.code)}</td><td>${esc(catName(p.cat))}</td><td>${fmt(p.sales)}</td><td>${INR(p.sales * money(p))}</td></tr>`).join('')}</table></div>` : '<p style="color:var(--muted)">No sales data yet.</p>'}</div>
+    <div class="card"><h3>Catalog by category</h3><div class="table-wrap"><table class="tbl"><tr><th>Category</th><th>Designs</th><th>Total sales</th></tr>${catDist.map(c => `<tr><td>${esc(c.name)}</td><td>${fmt(c.v)}</td><td>${fmt(byCatSales.find(b => b.name === c.name)?.v || 0)}</td></tr>`).join('')}</table></div></div>
   </div>`;
 }
 
