@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAXMI EMBROIDERY — Admin Control Center</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230e0e0f' stroke='%23c9a227' stroke-width='4'/%3E%3Ctext x='50' y='62' font-size='40' text-anchor='middle' fill='%23e5c76b' font-family='Georgia'%3EL%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="login-screen hidden">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="lg-brand">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e5c76b" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5 5l14 14M19 5L5 19"/></svg>
+        </span>
+        <b>LAXMI EMBROIDERY</b><small>Admin Control Center</small>
+      </div>
+      <h1>Good evening, Admin</h1>
+      <p class="log-sub">Sign in to manage your embroidery store.</p>
+      <form id="loginForm">
+        <div class="field"><label>Email</label><input type="email" value="admin@laxmiembroidery.in" required></div>
+        <div class="field"><label>Password</label><input type="password" value="laxmi123" required></div>
+        <button class="btn btn-gold btn-block" type="submit">Sign In to Dashboard</button>
+      </form>
+      <div class="log-note">Demo access — any credentials work. Open <b>admin</b> / <b>laxmi123</b>.</div>
+      <a class="log-back" href="index.html">← Back to storefront</a>
+    </div>
+  </div>
+
+  <!-- SHELL -->
+  <div id="shell" class="shell hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand">
+        <span class="lg-brand"><svg viewBox="0 0 24 24" fill="none" stroke="#e5c76b" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5 5l14 14M19 5L5 19"/></svg></span>
+        <div><b>LAXMI EMBROIDERY</b><small>Admin</small></div>
+      </div>
+      <nav class="side-nav" id="sideNav">
+        <a href="#/admin" data-nav="dashboard">Dashboard</a>
+        <a href="#/admin/products" data-nav="products">Products</a>
+        <a href="#/admin/products/new" data-nav="new">New Product</a>
+        <a href="#/admin/orders" data-nav="orders">Orders</a>
+        <a href="#/admin/customers" data-nav="customers">Customers</a>
+        <a href="#/admin/categories" data-nav="categories">Categories</a>
+        <a href="#/admin/collections" data-nav="collections">Collections</a>
+        <a href="#/admin/coupons" data-nav="coupons">Coupons</a>
+        <a href="#/admin/analytics" data-nav="analytics">Analytics</a>
+        <a href="#/admin/media" data-nav="media">Media</a>
+        <a href="#/admin/settings" data-nav="settings">Settings</a>
+      </nav>
+      <div class="side-foot">
+        <a class="btn btn-outline btn-sm btn-block" href="../store/index.html" target="_blank" rel="noopener">View Storefront ↗</a>
+        <button class="btn btn-ghost btn-sm btn-block" id="logoutBtn">Sign Out</button>
+      </div>
+    </aside>
+    <div class="main">
+      <header class="top">
+        <button class="burger" id="burger"><span></span><span></span><span></span></button>
+        <div>
+          <div class="top-h">Good evening, Admin</div>
+          <div class="top-s" id="topSubtitle">Here's what's happening with your embroidery store.</div>
+        </div>
+        <div class="top-right">
+          <span class="brand-contact-admin" style="display:flex;align-items:center;gap:10px;margin-right:16px;padding-right:16px;border-right:1px solid var(--line);font-size:.76rem;color:var(--muted);font-weight:600">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16" style="color:var(--gold)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span style="color:var(--gold-hi)">+91 98654 14464</span>
+          </span>
+          <span class="live-pill"><i></i> LIVE</span>
+          <div class="avatar">A</div>
+        </div>
+      </header>
+      <main id="app" class="content"></main>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+  <div class="modal-back" id="modalBack"><div class="modal" id="modalBox"></div></div>
+
+  <script src="qrcode.js"></script>
+<script src="artwork.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
