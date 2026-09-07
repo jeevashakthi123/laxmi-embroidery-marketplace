@@ -13,9 +13,9 @@
   --pink: #c51146;
   --pink-hi: #d63366;
   --pink-soft: rgba(197, 17, 70, 0.14);
-  --gold: #ffd700;
-  --gold-hi: #ffe066;
-  --gold-soft: rgba(255, 215, 0, 0.14);
+  --gold: #f8cd60;
+  --gold-hi: #fad888;
+  --gold-soft: rgba(248, 205, 96, 0.14);
   --champagne: #fff0e6;
   --text: #1a1a2e;
   --muted: #888099;
@@ -29,7 +29,7 @@
   --shadow-md: 0 8px 30px rgba(26,26,46,.10);
   --shadow-lg: 0 24px 60px rgba(26,26,46,.16);
   --shadow-pink: 0 10px 34px rgba(197, 17, 70, 0.3);
-  --shadow-gold: 0 10px 34px rgba(255,215,0,.3);
+  --shadow-gold: 0 10px 34px rgba(248, 205, 96, 0.3);
 
   --radius: 14px;
   --radius-lg: 22px;
