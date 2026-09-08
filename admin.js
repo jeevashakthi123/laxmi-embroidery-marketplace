@@ -633,31 +633,38 @@ function renderOrders() {
   const ORDRS = orders();
   const st = (new URLSearchParams(location.hash.split('?')[1] || '')).get('st') || '';
   const list = st ? ORDRS.filter(o => o.status === st) : ORDRS;
-  const totals = { Paid: 0, Pending: 0, Refunded: 0 };
+  const totals = { Paid: 0, 'Pending Approval': 0, Pending: 0, Refunded: 0 };
   ORDRS.forEach(o => { if (o.status in totals) totals[o.status] += Number(o.total || 0); });
   setSubtitle(`${fmt(ORDRS.length)} orders`);
   $('#app').innerHTML = `
   <div class="section-t">Orders</div><div class="section-s">Track and manage storefront orders.</div>
   <div class="stats-grid">
     <div class="stat reveal in"><div class="lbl">Paid revenue</div><div class="val">${INR(totals.Paid)}</div><span class="delta up">${fmt(ORDRS.filter(o => o.status === 'Paid').length)} paid</span></div>
+    <div class="stat reveal in"><div class="lbl">Pending Approval</div><div class="val">${INR(totals['Pending Approval'])}</div><span class="delta gold" style="color:var(--pink-hi)">${fmt(ORDRS.filter(o => o.status === 'Pending Approval').length)} awaiting</span></div>
     <div class="stat reveal in"><div class="lbl">Pending</div><div class="val">${INR(totals.Pending)}</div><span class="delta gold" style="color:var(--gold-hi)">${fmt(ORDRS.filter(o => o.status === 'Pending').length)} awaiting</span></div>
     <div class="stat reveal in"><div class="lbl">Refunded</div><div class="val">${INR(totals.Refunded)}</div><span class="delta dn">${fmt(ORDRS.filter(o => o.status === 'Refunded').length)} refunds</span></div>
-    <div class="stat reveal in"><div class="lbl">Avg order value</div><div class="val">${INR(Math.round(ORDRS.filter(o => o.status !== 'Refunded').reduce((s, o) => s + Number(o.total || 0), 0) / Math.max(1, ORDRS.filter(o => o.status !== 'Refunded').length)))}</div><span class="delta up">all time</span></div>
   </div>
   <div class="toolbar">
     <div class="range-tabs">
-      ${['', 'Paid', 'Pending', 'Refunded'].map(s => `<button class="${st === s ? 'active' : ''}" data-st="${s}">${s || 'All'}</button>`).join('')}
+      ${['', 'Paid', 'Pending Approval', 'Pending', 'Refunded'].map(s => `<button class="${st === s ? 'active' : ''}" data-st="${s}">${s || 'All'}</button>`).join('')}
     </div>
     <div class="spacer"></div>
-    <button class="btn btn-dark" id="seedOrders">＋ Seed demo orders</button>
+    <button class="btn btn-danger" id="clearOrders">🗑 Clear All Orders</button>
   </div>
-  <div class="table-wrap">${ordersTable(list, ['id', 'cust', 'items', 'total', 'pay', 'status', 'action'])}</div>`;
+  ${list.length ? `<div class="table-wrap">${ordersTable(list, ['id', 'cust', 'items', 'total', 'pay', 'status', 'action'])}</div>` : `
+  <div class="empty" style="padding:60px 20px">
+    <div class="art">${MP.motifArtwork({ code: '', motif: 'leaf', hue1: 'green', hue2: 'gold' }, 'cream', 120, { code: false })}</div>
+    <h2>No orders yet</h2>
+    <p style="color:var(--muted);margin:12px 0 24px">Orders from the storefront will appear here.</p>
+  </div>`}`;
   $$('.range-tabs button').forEach(b => b.onclick = () => { location.hash = b.dataset.st ? '#/admin/orders?st=' + encodeURIComponent(b.dataset.st) : '#/admin/orders'; });
-  $('#seedOrders').onclick = () => {
-    triggerSeed();
-    renderOrders();
-    toast('8 demo orders seeded', 'ok');
-  };
+  $('#clearOrders')?.addEventListener('click', () => {
+    if (confirm('Delete ALL orders? This cannot be undone.')) {
+      LS.set(K.ORDERS, []);
+      renderOrders();
+      toast('All orders cleared', 'ok');
+    }
+  });
   bindOrderViews(list);
 }
 function triggerSeed() {
