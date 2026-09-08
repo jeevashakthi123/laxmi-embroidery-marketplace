@@ -468,6 +468,9 @@ h1,h2,h3,h4 { font-family: var(--serif); font-weight: 600; line-height: 1.15; le
 .cart-item .ci-actions { display: flex; gap: 8px; }
 .ci-actions button { font-size: .78rem; color: var(--muted); }
 .ci-actions button:hover { color: var(--maroon); }
+.ci-actions .remove-btn { background: none; border: none; padding: 6px; border-radius: 8px; color: var(--maroon); transition: all .2s; }
+.ci-actions .remove-btn:hover { background: rgba(199,44,126,.1); color: #c72c7e; transform: scale(1.1); }
+.ci-actions .remove-btn svg { width: 18px; height: 18px; }
 
 .summary { background: var(--black); color: #fff; border-radius: var(--radius-lg); padding: 28px; position: sticky; top: 96px; }
 .summary h3 { margin-bottom: 20px; }

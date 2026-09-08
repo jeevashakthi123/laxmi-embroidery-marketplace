@@ -900,8 +900,8 @@ function renderCart() {
             <h3><a href="#/design/${r.p.slug}">${esc(r.p.name)}</a></h3>
             <div class="ci-specs">${fmt(r.p.stitches)} st · ${r.p.w} × ${r.p.h} mm · ${(r.p.formats || []).join(', ')}</div>
             <div class="ci-actions">
-              <button data-wish="${r.p.id}">♡ Wishlist</button>
-              <button data-remove="${r.p.id}">Remove</button>
+              <button data-wish="${r.p.id}" title="Add to wishlist">♡</button>
+              <button class="remove-btn" data-remove="${r.p.id}" title="Remove from cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
             </div>
           </div>
           <div class="ci-side">
