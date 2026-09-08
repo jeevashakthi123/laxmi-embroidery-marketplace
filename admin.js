@@ -738,34 +738,66 @@ function renderCategories() {
   setSubtitle(`${fmt(CATEGORIES.length)} categories`);
   $('#app').innerHTML = `
   <div class="section-t">Categories</div><div class="section-s">Group your designs — shown in the storefront shop filter and directory.</div>
+  <div class="toolbar" style="margin-bottom:16px">
+    <div class="search-in" style="flex:1;max-width:300px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="catSearch" placeholder="Search categories…"></div>
+    <button class="btn btn-outline" id="bulkAddBtn">＋ Bulk Add</button>
+    <button class="btn btn-outline" id="importCsvBtn">⬆ Import CSV</button>
+    <input type="file" id="csvFile" accept=".csv" style="display:none">
+  </div>
   <div class="grid-main-side">
     <div class="table-wrap"><table class="tbl">
       <tr><th></th><th>Category</th><th>Slug</th><th>Designs</th><th class="shrink">Actions</th></tr>
-      ${CATEGORIES.map((c, i) => `<tr>
+      ${CATEGORIES.map((c, i) => `<tr data-name="${esc(c.name).toLowerCase()}" data-id="${esc(c.id).toLowerCase()}">
         <td><span class="mini-thumb">${MP.catArt(c.id, 'cream')}</span></td>
         <td><b>${esc(c.name)}</b></td><td style="color:var(--dim)">${esc(c.id)}</td><td><span class="pill blue">${fmt(count(c.id))}</span></td>
         <td class="shrink"><div style="display:flex;gap:6px">
-          <button class="btn btn-ic btn-dark" data-cedit="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>
-          <button class="btn btn-ic btn-danger" data-cdel="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+          <button class="btn btn-ic btn-dark" data-cedit="${i}" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>
+          <button class="btn btn-ic btn-danger" data-cdel="${i}" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
         </div></td>
       </tr>`).join('')}
       ${CATEGORIES.length == 0 ? `<tr><td colspan="5"><div class="empty"><h3>No categories yet</h3></div></td></tr>` : ''}
     </table></div>
-    <div class="card"><h3>${'Add category'}</h3>
+    <div class="card"><h3>Add single category</h3>
       <div class="field"><label>Name</label><input id="nName" placeholder="e.g. Floral"></div>
       <div class="field"><label>Slug / id</label><input id="nId" placeholder="e.g. floral"></div>
       <button class="btn btn-gold btn-block" id="nSave">Add category</button>
     </div>
+    <div class="card" id="bulkAddCard" style="display:none"><h3>Bulk add categories</h3>
+      <p class="section-s">Paste one category per line: <code>Name | slug</code> (slug optional)</p>
+      <textarea id="bulkInput" rows="10" placeholder="Floral | floral&#10;Bridal | bridal&#10;Aari Cut"></textarea>
+      <button class="btn btn-gold btn-block" id="bulkSave">Add all</button>
+    </div>
   </div>`;
-  $('#nSave').onclick = () => {
-    const name = $('#nName').value.trim();
-    const id = $('#nId').value.trim() || slugify(name);
-    if (!name || CATEGORIES.some(c => c.id === id)) { toast(name ? 'Category already exists' : 'Enter a category name', 'danger'); return; }
-    CATEGORIES.push({ id, name, count: 0 });
-    syncCats();
-    toast('Category added', 'ok');
-    renderCategories();
+  
+  // Search filter
+  $('#catSearch').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    $$('#app table.tbl tbody tr').forEach(row => {
+      const match = row.dataset.name.includes(term) || row.dataset.id.includes(term);
+      row.style.display = match ? '' : 'none';
+    });
+  });
+  
+  // Bulk add toggle
+  $('#bulkAddBtn').onclick = () => {
+    const card = $('#bulkAddCard');
+    card.style.display = card.style.display === 'none' ? 'block' : 'none';
   };
+  
+  // CSV import
+  $('#importCsvBtn').onclick = () => $('#csvFile').click();
+  $('#csvFile').onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => importCategoriesCSV(ev.target.result);
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+  
+  $('#nSave').onclick = () => addSingleCategory();
+  $('#bulkSave').onclick = () => addBulkCategories();
+  
   $$('[data-cedit]').forEach(b => b.onclick = () => editCategory(+b.dataset.cedit));
   $$('[data-cdel]').forEach(b => b.onclick = () => {
     const c = CATEGORIES[+b.dataset.cdel];
@@ -774,6 +806,55 @@ function renderCategories() {
     toast(`Category “${esc(c.name)}” deleted`, 'ok');
     renderCategories();
   });
+}
+
+function addSingleCategory() {
+  const name = $('#nName').value.trim();
+  const id = $('#nId').value.trim() || slugify(name);
+  if (!name || CATEGORIES.some(c => c.id === id)) { toast(name ? 'Category already exists' : 'Enter a category name', 'danger'); return; }
+  CATEGORIES.push({ id, name, count: 0 });
+  syncCats();
+  toast('Category added', 'ok');
+  renderCategories();
+}
+
+function addBulkCategories() {
+  const text = $('#bulkInput').value.trim();
+  if (!text) { toast('Paste categories first', 'danger'); return; }
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  let added = 0;
+  lines.forEach(line => {
+    const parts = line.split('|').map(s => s.trim());
+    const name = parts[0];
+    const id = parts[1] || slugify(name);
+    if (name && !CATEGORIES.some(c => c.id === id)) {
+      CATEGORIES.push({ id, name, count: 0 });
+      added++;
+    }
+  });
+  if (added) { syncCats(); toast(`Added ${added} categories`, 'ok'); renderCategories(); }
+  else { toast('No new categories added', 'info'); }
+}
+
+function importCategoriesCSV(csvText) {
+  const lines = csvText.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length < 2) { toast('CSV needs header + data rows', 'danger'); return; }
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const nameIdx = headers.indexOf('name');
+  const idIdx = headers.indexOf('id') !== -1 ? headers.indexOf('id') : headers.indexOf('slug');
+  if (nameIdx === -1) { toast('CSV must have a "name" column', 'danger'); return; }
+  let added = 0;
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+    const name = cols[nameIdx];
+    const id = idIdx !== -1 ? cols[idIdx] : slugify(name);
+    if (name && !CATEGORIES.some(c => c.id === id)) {
+      CATEGORIES.push({ id, name, count: 0 });
+      added++;
+    }
+  }
+  if (added) { syncCats(); toast(`Imported ${added} categories from CSV`, 'ok'); renderCategories(); }
+  else { toast('No new categories imported', 'info'); }
 }
 function editCategory(i) {
   const c = CATEGORIES[i];
