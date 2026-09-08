@@ -1077,13 +1077,14 @@ function renderAnnounce() {
 }
 function finalizeOrder(order) {
   const orders = LS.get(US.ORDERS, []);
+  // Set status to pending admin approval instead of immediate Paid
+  order.status = 'Pending Approval';
+  order.wall = true;
   orders.push(order); LS.set(US.ORDERS, orders);
-  const dls = LS.get(US.DOWNLOADS, []);
-  order.items.forEach(r => { if (!dls.some(d => d.order === order.id && d.id === r.id)) dls.push({ order: order.id, id: r.id, name: r.name, date: order.date, formats: r.formats }); });
-  LS.set(US.DOWNLOADS, dls);
+  // DO NOT add to downloads yet - wait for admin approval
   LS.set(US.AUTH, { name: order.customer.name, email: order.customer.email, phone: order.customer.phone, joined: new Date().toISOString().slice(0, 10), guest: false });
   cart = []; saveCart(); activeCoupon.code = null;
-  location.hash = '#/success?order=' + encodeURIComponent(order.id);
+  location.hash = '#/success?order=' + encodeURIComponent(order.id) + '&pending=1';
 }
 function showPaymentWall(order) {
   openModal(`<div class="pw-wall">
@@ -1107,6 +1108,7 @@ function showPaymentWall(order) {
 /* ---------------- SUCCESS ---------------- */
 function renderSuccess(q) {
   const id = (q && q.get('order')) || '';
+  const pending = q && q.get('pending') === '1';
   const order = LS.get(US.ORDERS, []).find(o => o.id === id);
   const me = currentUser();
   if (!me) LS.set(US.AUTH, { name: order?.customer?.name || 'Customer', email: order?.customer?.email || '', phone: order?.customer?.phone || '', guest: true });
@@ -1121,6 +1123,15 @@ function renderSuccess(q) {
       </svg>
       ${confetti()}
     </div>
+    ${pending ? `
+      <h1 style="font-size:clamp(2rem,4vw,2.8rem)">Order Received</h1>
+      <p style="color:var(--pink);max-width:420px;margin:12px auto 6px;font-weight:700">⏳ Awaiting Admin Approval</p>
+      <p style="color:var(--muted);max-width:420px;margin:12px auto 6px">Your order <b>${order.id}</b> has been received. Our team will verify payment and approve your download within 24 hours. You'll receive an email once approved.</p>
+      <div style="display:flex;gap:14px;justify-content:center;margin-top:30px;flex-wrap:wrap">
+        <a class="btn btn-ghost" href="#/orders">Track Order</a>
+        <a class="btn btn-outline" href="#/shop">Continue Shopping</a>
+      </div>
+    ` : `
     <h1 style="font-size:clamp(2rem,4vw,2.8rem)">Order Confirmed</h1>
     <p style="color:var(--muted);max-width:420px;margin:12px auto 6px">Your embroidery files are ready.</p>
     <p style="font-size:.9rem;color:var(--muted)">${order ? 'Order ' + order.id + ' · ' + order.items.length + ' design' + (order.items.length === 1 ? '' : 's') + ' · ' + INR(order.total) : ''}</p>
@@ -1129,6 +1140,7 @@ function renderSuccess(q) {
       <a class="btn btn-ghost" href="#/orders">View Orders</a>
       <a class="btn btn-outline" href="#/shop">Keep Browsing</a>
     </div>
+    `}
   </div>`;
 }
 function confetti() {
@@ -1237,7 +1249,7 @@ function renderDownloads() {
   const me = currentUser();
   let dls = LS.get(US.DOWNLOADS, []);
   if (me && me.email) {
-    const myOrders = LS.get(US.ORDERS, []).filter(o => o.user === me.email).map(o => o.id);
+    const myOrders = LS.get(US.ORDERS, []).filter(o => o.user === me.email && o.status === 'Paid').map(o => o.id);
     dls = dls.filter(d => myOrders.includes(d.order));
   }
   const orders = LS.get(US.ORDERS, []).length;
@@ -1258,7 +1270,7 @@ function renderDownloads() {
     <div class="note" style="margin-top:16px">${me ? 'Your downloads are linked to your account' : 'Your downloads are stored on this device'} · ${orders} orders · Unlimited re-downloads · License: personal &amp; small-batch commercial embroidery.</div>`
     : `
     <div class="empty"><div class="art">${MP.motifArtwork({ code: '', motif: 'mandala', hue1: 'gold', hue2: 'maroon' }, 'cream', 420, { code: false })}</div>
-      <h2>Your purchased designs will appear here</h2><p>Complete a checkout and your files unlock instantly. Downloads never expire.</p>
+      <h2>Your purchased designs will appear here</h2><p>Complete a checkout and wait for admin approval. Once approved, files unlock instantly. Downloads never expire.</p>
       <a class="btn btn-gold" href="#/shop">Find a design</a></div>`}
   </div></section>`;
   $$('[data-dl]').forEach(a => a.onclick = (e) => {

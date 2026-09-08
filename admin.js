@@ -682,8 +682,12 @@ function openOrderModal(o) {
       ${o.items.map(i => `<tr><td>${esc(i.name)}</td><td>×${i.qty}</td><td>${INR(i.price * i.qty)}</td></tr>`).join('')}
     </table></div></div>
     <div style="display:flex;justify-content:space-between;margin:14px 0 20px;font-weight:800"><span>Total</span><span style="color:var(--gold-hi)">${INR(o.total || 0)}</span></div>
-    <div class="field"><label>Order status</label><select id="oStatus">${['Paid', 'Pending', 'Refunded', 'Cancelled'].map(s => `<option ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn btn-dark" data-close-modal="">Close</button><button class="btn btn-gold" id="oSave">Save status</button></div>`);
+    <div class="field"><label>Order status</label><select id="oStatus">${['Paid', 'Pending Approval', 'Pending', 'Refunded', 'Cancelled'].map(s => `<option ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-dark" data-close-modal="">Close</button>
+      ${o.status === 'Pending Approval' ? `<button class="btn btn-gold" id="oApprove">✓ Approve & Unlock Downloads</button>` : ''}
+      <button class="btn btn-gold" id="oSave">Save status</button>
+    </div>`);
   $('#oSave').onclick = () => {
     o.status = $('#oStatus').value;
     saveOrders();
@@ -691,6 +695,20 @@ function openOrderModal(o) {
     toast('Order updated', 'ok');
     renderOrders();
   };
+  const approveBtn = $('#oApprove');
+  if (approveBtn) {
+    approveBtn.onclick = () => {
+      o.status = 'Paid';
+      // Add files to downloads
+      const dls = LS.get(K.DOWNLOADS, []);
+      o.items.forEach(r => { if (!dls.some(d => d.order === o.id && d.id === r.id)) dls.push({ order: o.id, id: r.id, name: r.name, date: o.date, formats: r.formats }); });
+      LS.set(K.DOWNLOADS, dls);
+      saveOrders();
+      closeModal();
+      toast('Order approved! Downloads unlocked for customer.', 'ok');
+      renderOrders();
+    };
+  }
 }
 
 /* ---------------- CUSTOMERS ---------------- */
