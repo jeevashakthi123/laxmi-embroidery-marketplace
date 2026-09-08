@@ -201,7 +201,10 @@ var MP = (function () {
     </svg>`;
   }
 
-  const CAT_MOTIF = { 'front-neck': 'front-neck', 'back-neck': 'back-neck', 'sleeve-buttas': 'butta', 'borders': 'border', 'motifs': 'mandala', 'bridal': 'bridal', 'arabic': 'arabic', 'traditional': 'traditional', 'kids': 'kid', 'floral': 'floral', 'applique': 'rose', 'zari': 'zari' };
+  const CAT_MOTIF = { 
+  'front-neck': 'front-neck', 'back-neck': 'back-neck', 'sleeve-buttas': 'butta', 'borders': 'border', 'motifs': 'mandala', 'bridal': 'bridal', 'arabic': 'arabic', 'traditional': 'traditional', 'kids': 'kid', 'floral': 'floral', 'applique': 'rose', 'zari': 'zari',
+  'aari-cut': 'traditional', 'all-over': 'mandala', 'animals': 'kid', 'baby-shower': 'kid', 'beads': 'zari', 'birds': 'kid', 'boat': 'traditional', 'bridal-br': 'bridal', 'bunch': 'floral', 'butterfly': 'kid', 'checks': 'border', 'christmas': 'festive', 'coat-neck': 'front-neck', 'colour-neck': 'front-neck', 'coming-soon': 'motif', 'cow': 'kid', 'cross-stitch': 'traditional', 'cut-work': 'zari', 'deer': 'kid', 'doll': 'kid', 'double-neck': 'front-neck', 'double-shoulder': 'butta', 'dress': 'floral', 'elephant': 'kid', 'fish': 'kid', 'flowers': 'floral', 'frames': 'border', 'fruit': 'floral', 'goat': 'kid', 'hand-cut-line': 'traditional', 'heart': 'kid', 'home': 'traditional', 'house': 'traditional', 'jewellery': 'zari', 'kutch': 'traditional', 'leaf': 'floral', 'lotus': 'floral', 'madhubala': 'traditional', 'mango': 'floral', 'mickey': 'kid', 'mirror': 'zari', 'net-cloth-work': 'zari', 'outside-neck-off': 'front-neck', 'parrot': 'kid', 'peacock': 'bridal', 'photo-design': 'motif', 'pillow-cover': 'floral', 'purse-cut': 'zari', 'rangoli': 'mandala', 'rose': 'floral', 'saree-borders': 'border', 'simple': 'motif', 'square': 'border', 'stone-work': 'zari', 'temple': 'traditional', 'toy-hand': 'kid', 'tree': 'floral', 'umbrella': 'kid', 'v-neck': 'front-neck'
+};
   function catArt(catId, fab) {
     return motifArtwork({ id: catId, name: catId, code: '', motif: CAT_MOTIF[catId] || 'motif', hue1: 'gold', hue2: 'maroon' }, fab || 'cream', 420, { code: false });
   }
