@@ -746,16 +746,15 @@ function renderCategories() {
   </div>
   <div class="grid-main-side">
     <div class="table-wrap"><table class="tbl">
-      <tr><th></th><th>Category</th><th>Slug</th><th>Designs</th><th class="shrink">Actions</th></tr>
+      <tr><th>Category</th><th>Slug</th><th>Designs</th><th class="shrink">Actions</th></tr>
       ${CATEGORIES.map((c, i) => `<tr data-name="${esc(c.name).toLowerCase()}" data-id="${esc(c.id).toLowerCase()}">
-        <td><span class="mini-thumb">${MP.catArt(c.id, 'cream')}</span></td>
         <td><b>${esc(c.name)}</b></td><td style="color:var(--dim)">${esc(c.id)}</td><td><span class="pill blue">${fmt(count(c.id))}</span></td>
         <td class="shrink"><div style="display:flex;gap:6px">
           <button class="btn btn-ic btn-dark" data-cedit="${i}" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>
           <button class="btn btn-ic btn-danger" data-cdel="${i}" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
         </div></td>
       </tr>`).join('')}
-      ${CATEGORIES.length == 0 ? `<tr><td colspan="5"><div class="empty"><h3>No categories yet</h3></div></td></tr>` : ''}
+      ${CATEGORIES.length == 0 ? `<tr><td colspan="4"><div class="empty"><h3>No categories yet</h3></div></td></tr>` : ''}
     </table></div>
     <div class="card"><h3>Add single category</h3>
       <div class="field"><label>Name</label><input id="nName" placeholder="e.g. Floral"></div>
