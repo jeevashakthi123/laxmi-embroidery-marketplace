@@ -386,8 +386,11 @@ function renderHome() {
       ${sectionHead('Collections', 'Shop by Category', 'From regal front necks to delicate sleeve buttas — find the motif your garment deserves.', true)}
       <div class="cat-grid">
         ${cats.map(c => `<a href="#/shop?cat=${c.id}" class="cat-card reveal">
-          <div class="art">${MP.catArt(c.id)}</div>
-          <div class="overlay"><h3>${c.name}</h3><p>${c.count} designs</p></div>
+          <div class="cat-info">
+            <h3>${c.name}</h3>
+            <p>${c.count} designs</p>
+            <span class="slug">${c.id}</span>
+          </div>
           <span class="count">${c.count}</span>
         </a>`).join('')}
       </div>
