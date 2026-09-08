@@ -15,7 +15,7 @@ const US = {
   AUTH: 'laxmi_auth', DOWNLOADS: 'laxmi_dl', COUPONS: 'laxmi_coupons', SETTINGS: 'laxmi_settings'
 };
 
-const settings = Object.assign({ phone: '9865414464', email: 'laxmiembroidery@gmail.com', code: 'LE409', whatsapp: '919865414464', name: 'LAXMI EMBROIDERY', tag: 'Premium Digital Embroidery Designs', heroBadge: '✦ Premium Digitised Embroidery · Instant Download', heroTitle: 'Premium Machine <em>Embroidery</em> Designs', heroSub: 'Beautifully digitized designs for embroidery machines, creators and embroidery professionals. Crafted stitch by stitch, delivered instantly.', paywallOn: false, payMode: 'demo', upiId: 'laxmiembroidery@upi', payeeName: 'LAXMI EMBROIDERY', payNote: 'Scan the QR or pay via any UPI app, then confirm.', payQR: null, payQRName: '' }, LS.get(US.SETTINGS, {}));
+const settings = Object.assign({ phone: '8838502681', email: 'laxmiembroidery@gmail.com', code: 'LE409', whatsapp: '918838502681', name: 'LAXMI EMBROIDERY', tag: 'Premium Digital Embroidery Designs', heroBadge: '✦ Premium Digitised Embroidery · Instant Download', heroTitle: 'Premium Machine <em>Embroidery</em> Designs', heroSub: 'Beautifully digitized designs for embroidery machines, creators and embroidery professionals. Crafted stitch by stitch, delivered instantly.', paywallOn: false, payMode: 'demo', upiId: 'jeevashakthi2k5@okhdfcbank', payeeName: 'LAXMI EMBROIDERY', payNote: 'Scan the QR or pay via any UPI app, then confirm.', payQR: null, payQRName: '' }, LS.get(US.SETTINGS, {}));
 
 /* ---------------- Seed data ---------------- */
 const CATEGORY_SEED = [
@@ -992,31 +992,23 @@ function renderCheckout() {
             ${paywallUp?'<div class="pw-banner">🛡 Payment wall active — files unlock once payment is confirmed.</div>':''}
             
             <label style="display:flex;align-items:center;gap:10px;font-weight:600;margin-bottom:14px;cursor:pointer">
-              <input type="radio" name="pay" value="cod" checked> Pay on Delivery (Cash)
+              <input type="radio" name="pay" value="upi_qr" checked> Scan QR Code (UPI Apps)
             </label>
             
-            <label style="display:flex;align-items:center;gap:10px;font-weight:600;margin-bottom:14px;cursor:pointer">
-              <input type="radio" name="pay" value="upi_qr"> Scan QR Code (UPI Apps)
-            </label>
-            
-            <div id="upiQrSection" style="display:none;margin-top:12px;padding:20px;background:var(--pink-soft);border-radius:14px;border:1px solid var(--pink)">
+            <div id="upiQrSection" style="margin-top:12px;padding:20px;background:var(--pink-soft);border-radius:14px;border:1px solid var(--pink)">
               <div class="pw-title" style="text-align:center;margin-bottom:12px">${esc(settings.payeeName || 'LAXMI EMBROIDERY')}</div>
               <div class="pw-qr" style="display:flex;justify-content:center;margin-bottom:16px">${payQrBlock(total, 'LAXMI-ONLINE')}</div>
               <div style="text-align:center;margin-bottom:16px">
                 <div style="font-size:.9rem;color:var(--muted);margin-bottom:4px">UPI ID</div>
-                <div style="font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--pink);word-break:break-all">${esc(settings.upiId)}</div>
+                <div style="font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--pink);word-break:break-all">${esc(settings.upiId || 'jeevashakthi2k5@okhdfcbank')}</div>
               </div>
               <div style="text-align:center;margin-bottom:16px">
                 <div style="font-size:.9rem;color:var(--muted);margin-bottom:4px">Phone Number (UPI)</div>
-                <div style="font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--pink)">${esc(settings.phone || '9865414464')}</div>
+                <div style="font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--pink)">8838502681</div>
               </div>
               <div class="pw-sub" style="text-align:center">Scan with <b>Google Pay / PhonePe / Paytm / BHIM</b> — or pay <b style="color:var(--maroon)">${INR(total)}</b> to the UPI ID/Phone above.</div>
               <div class="pw-note" style="text-align:center;margin-top:8px">${esc(settings.payNote)}</div>
             </div>
-            
-            <label style="display:flex;align-items:center;gap:10px;font-weight:600;margin-bottom:14px;cursor:pointer">
-              <input type="radio" name="pay" value="upi_direct"> Open Google Pay / UPI App
-            </label>
             
             <div class="note" style="margin-top:12px">${paywallUp?'Payments are simulated for this demo — confirmation instantly marks the order paid and grants your files.':'Digital Downloads are simulated in this demo — files are granted to your account immediately after checkout.'}</div>
           </div>
@@ -1056,23 +1048,9 @@ function renderCheckout() {
       items: rows.map(r => ({ id: r.p.id, name: r.p.name, qty: r.qty, price: money(r.p), formats: r.p.formats })),
       sub, disc, total, pay: payMethod, status: 'Pending Approval', user: fd.get('email'), wall: paywallUp
     };
-    if (payMethod === 'upi_direct') {
-      const uri = upiUri(total, order.id);
-      window.location.href = uri;
-      setTimeout(() => finalizeOrder(order), 500);
-      return;
-    }
     if (paywallUp && payMethod === 'upi_qr') { showPaymentWall(order); return; }
     finalizeOrder(order);
   });
-
-  const upiQrRadio = $('#coForm input[value="upi_qr"]');
-  const upiQrSection = $('#upiQrSection');
-  if (upiQrRadio && upiQrSection) {
-    upiQrRadio.addEventListener('change', () => {
-      upiQrSection.style.display = upiQrRadio.checked ? 'block' : 'none';
-    });
-  }
 }
 
 function paywallActive() {

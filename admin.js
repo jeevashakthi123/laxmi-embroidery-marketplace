@@ -17,7 +17,7 @@ const K = {
   CATS: 'laxmi_categories', COLLS: 'laxmi_collections', ADMIN: 'laxmi_admin'
 };
 
-const settings = Object.assign({ phone: '9865414464', email: 'laxmiembroidery@gmail.com', code: 'LE409', whatsapp: '919865414464', name: 'LAXMI EMBROIDERY', tag: 'Premium Digital Embroidery Designs', heroBadge: '✦ Premium Digitised Embroidery · Instant Download', heroTitle: 'Premium Machine <em>Embroidery</em> Designs', heroSub: 'Beautifully digitized designs for embroidery machines, creators and embroidery professionals. Crafted stitch by stitch, delivered instantly.', address: 'Chennai, Tamil Nadu, India', announcement: '', paywallOn: false, payMode: 'demo', upiId: 'laxmiembroidery@upi', payeeName: 'LAXMI EMBROIDERY', payNote: 'Scan the QR or pay via any UPI app, then confirm.', payQR: null, payQRName: '' }, LS.get(K.SETTINGS, {}));
+const settings = Object.assign({ phone: '8838502681', email: 'laxmiembroidery@gmail.com', code: 'LE409', whatsapp: '918838502681', name: 'LAXMI EMBROIDERY', tag: 'Premium Digital Embroidery Designs', heroBadge: '✦ Premium Digitised Embroidery · Instant Download', heroTitle: 'Premium Machine <em>Embroidery</em> Designs', heroSub: 'Beautifully digitized designs for embroidery machines, creators and embroidery professionals. Crafted stitch by stitch, delivered instantly.', address: 'Chennai, Tamil Nadu, India', announcement: '', paywallOn: false, payMode: 'demo', upiId: 'jeevashakthi2k5@okhdfcbank', payeeName: 'LAXMI EMBROIDERY', payNote: 'Scan the QR or pay via any UPI app, then confirm.', payQR: null, payQRName: '' }, LS.get(K.SETTINGS, {}));
 
 const CATEGORY_SEED = [
   { id: 'front-neck', name: 'Front Neck', count: 18 },
