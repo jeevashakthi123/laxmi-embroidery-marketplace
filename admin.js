@@ -437,31 +437,28 @@ function toggleFeatured(id) {
 
 /* ---------------- PRODUCT FORM ---------------- */
 const MOTIFS = ['floral', 'front-neck', 'back-neck', 'butta', 'mandala', 'arabic', 'traditional', 'zari', 'rose', 'leaf', 'paisley', 'border', 'kid', 'motif'];
-const THREAD_KEYS = ['gold', 'maroon', 'deep', 'rust', 'teal', 'emerald', 'pink', 'rose', 'sky', 'red', 'green', 'cream', 'ink', 'plum', 'black'];
 function renderProductForm(idOrNull) {
   const edit = idOrNull != null && !['new', 'null', 'undefined'].includes(String(idOrNull));
   const p = edit ? byId(idOrNull) : {
-    id: null, code: '', name: '', price: 199, sale: null, cat: 'front-neck', sub: '', coll: [], tags: [], motif: 'floral',
-    stitches: 5000, w: 120, h: 140, colors: 5, formats: ['DST', 'PES', 'JEF', 'EXP'], hoop: '5 × 7"', rating: 4.8, reviews: 0,
-    desc: '', suitable: ['Blouse', 'Kurti'], status: 'active', created: new Date().toISOString().slice(0, 10), sales: 0, featured: false, free: false, hue1: 'gold', hue2: 'maroon', fab: 'cream', media: []
+    id: null, code: '', name: '', price: 199, sale: null, cat: 'front-neck',
+    stitches: 5000, colors: 5, formats: ['DST', 'PES', 'JEF', 'EXP'], 
+    rating: 4.8, reviews: 0, desc: '', suitable: ['Blouse', 'Kurti'], 
+    status: 'active', created: new Date().toISOString().slice(0, 10), 
+    sales: 0, featured: false, free: false, media: []
   };
   if (edit && !p) { $('#app').innerHTML = `<div class="empty"><h3>Design not found</h3><a class="btn btn-gold" href="#/admin/products">Back to catalog</a></div>`; return; }
   setSubtitle(edit ? 'Editing ' + esc(p.name) : 'Add a new design to your catalog');
-  const motifs = MOTIFS.map((m, i) => `<option value="${m}" ${p.motif === m ? 'selected' : ''}>${m}</option>`).join('');
-  const hueOpts = (cur) => THREAD_KEYS.map(k => `<option value="${k}" ${cur === k ? 'selected' : ''}>${k} · ${(MP.THREAD[k])}</option>`).join('');
   const collOpts = COLLECTIONS.map(c => `<label class="fmt-chip ${(p.coll || []).includes(c.id) ? 'on' : ''}" style="cursor:pointer"><input type="checkbox" value="${c.id}" ${(p.coll || []).includes(c.id) ? 'checked' : ''} style="display:none">${esc(c.name)}</label>`).join('');
   const catOpts = CATEGORIES.map(c => `<option value="${c.id}" ${p.cat === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
-  const fabs = Object.keys(MP.FABRICS);
-  const stages = fabs.map(f => `<div class="pstage ${p.fab === f ? 'primary' : ''}" data-fab="${f}" style="background:${f === 'black' || f === 'maroon' || f === 'green' || f === 'navy' ? '#191613' : '#f3ecdb'}"><div class="art">${MP.motifArtwork(p, f, 120, { code: false })}</div><span class="pm">${f}</span></div>`).join('');
   const fileRows = (p.media || []).map((m, i) => fileRowHtml(m, i, p.id)).join('');
   $('#app').innerHTML = `
-  <div class="section-t">${edit ? 'Edit design' : 'New design'}</div><div class="section-s">Fields marked <b style="color:var(--red)">*</b> are required. Preview regenerates from the chosen motif.</div>
+  <div class="section-t">${edit ? 'Edit design' : 'New design'}</div><div class="section-s">Fields marked <b style="color:var(--red)">*</b> are required.</div>
   <div class="grid-main-side" style="grid-template-columns:1.9fr 1fr">
     <div class="stack">
       <div class="card"><h3>Basics</h3>
         <div class="grid2">
-          <div class="field"><label>Design name <b>*</b></label><input id="fName" value="${esc(p.name)}" placeholder="e.g. Royal Floral Neckline"></div>
-          <div class="field"><label>Code <b>*</b></label><input id="fCode" value="${esc(p.code)}" placeholder="e.g. LE025" ${edit ? 'readonly style="opacity:.5"' : ''}></div>
+          <div class="field"><label>Design Name <b>*</b></label><input id="fName" value="${esc(p.name)}" placeholder="e.g. Royal Floral Neckline"></div>
+          <div class="field"><label>Model Number (Code) <b>*</b></label><input id="fCode" value="${esc(p.code)}" placeholder="e.g. LE025" ${edit ? 'readonly style="opacity:.5"' : ''}></div>
           <div class="field"><label>Price (₹)</label><input id="fPrice" type="number" min="0" value="${p.price ?? 0}"></div>
           <div class="field"><label>Sale price (₹, optional)</label><input id="fSale" type="number" min="0" value="${p.sale ?? ''}" placeholder="Leave blank for no sale"></div>
         </div>
@@ -473,21 +470,12 @@ function renderProductForm(idOrNull) {
       <div class="card"><h3>Technical</h3>
         <div class="grid3">
           <div class="field"><label>Category <b>*</b></label><select id="fCat">${catOpts}</select></div>
-          <div class="field"><label>Motif</label><select id="fMotif">${motifs}</select></div>
-          <div class="field"><label>Status</label><select id="fStatus">${['active', 'draft', 'disabled'].map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
-          <div class="field"><label>Stitch count</label><input id="fStitches" type="number" min="0" value="${p.stitches ?? 0}"></div>
-          <div class="field"><label>Width (mm)</label><input id="fW" type="number" min="1" value="${p.w ?? 100}"></div>
-          <div class="field"><label>Height (mm)</label><input id="fH" type="number" min="1" value="${p.h ?? 120}"></div>
-          <div class="field"><label>Colours</label><input id="fColors" type="number" min="1" max="30" value="${p.colors ?? 5}"></div>
-          <div class="field"><label>Hoop size</label><input id="fHoop" value="${esc(p.hoop || '')}" placeholder="5 × 7&quot;"></div>
-          <div class="field"><label>Thread 1</label><select id="fHue1">${hueOpts(p.hue1)}</select></div>
-          <div class="field"><label>Thread 2</label><select id="fHue2">${hueOpts(p.hue2)}</select></div>
-          <div class="field"><label>Sub-category</label><select id="fSub"><option value="">—</option>${catOpts.replaceAll('selected', '')}</select></div>
-          <div class="field"><label>Tags</label><input id="fTags" value="${esc((p.tags || []).join(', '))}" placeholder="floral, royal, festive"></div>
+          <div class="field"><label>Stitch Count <b>*</b></label><input id="fStitches" type="number" min="0" value="${p.stitches ?? 0}"></div>
+          <div class="field"><label>Colours <b>*</b></label><input id="fColors" type="number" min="1" max="30" value="${p.colors ?? 5}"></div>
         </div>
         <div class="field" style="margin-bottom:0"><label>Description</label><textarea id="fDesc" rows="4" placeholder="Describe the design…">${esc(p.desc || '')}</textarea></div>
       </div>
-      <div class="card"><h3>Formats produced</h3><div class="formats-toggle" id="fmtWrap">${['DST', 'PES', 'JEF', 'EXP', 'PNG', 'SVG'].map(f => `<span class="fmt-chip ${(p.formats || []).includes(f) ? 'on' : ''}" data-raw="${f}">${f}</span>`).join('')}</div></div>
+      <div class="card"><h3>Formats</h3><div class="formats-toggle" id="fmtWrap">${['DST', 'PES', 'JEF', 'EXP'].map(f => `<span class="fmt-chip ${(p.formats || []).includes(f) ? 'on' : ''}" data-raw="${f}">${f}</span>`).join('')}</div></div>
       <div class="card"><h3>Collections</h3><div class="formats-toggle" id="collWrap">${collOpts}</div></div>
       <div class="card"><h3>Media <span class="chip pill blue" style="font-size:.66rem">optional uploads</span></h3>
         <div class="drop" id="drop">
@@ -499,9 +487,9 @@ function renderProductForm(idOrNull) {
       </div>
     </div>
     <div class="stack">
-      <div class="card"><h3>Preview generator <span class="chip pill gold">procedural</span></h3>
-        <p class="section-s" style="margin-bottom:12px">Pick the fabric for the storefront preview — the artwork is stitched live via the shared engine.</p>
-        <div class="preview-stages" id="stages">${stages}</div>
+      <div class="card"><h3>Preview <span class="chip pill gold">procedural</span></h3>
+        <p class="section-s" style="margin-bottom:12px">Preview regenerates from category.</p>
+        <div class="preview-stages" id="stages">${Object.keys(MP.FABRICS).map(f => `<div class="pstage" data-fab="${f}" style="background:${f === 'black' || f === 'maroon' || f === 'green' || f === 'navy' ? '#191613' : '#f3ecdb'}"><div class="art">${MP.motifArtwork({...p, motif: CAT_MOTIF[p.cat] || 'floral'}, f, 120, { code: false })}</div><span class="pm">${f}</span></div>`).join('')}</div>
         <p class="section-s" style="margin:12px 0 6px;font-size:.74rem;color:var(--dim)">Tip: dense motifs read best on black/cream backgrounds.</p>
       </div>
       <div class="card" style="position:sticky;top:82px">
@@ -513,10 +501,7 @@ function renderProductForm(idOrNull) {
     </div>
   </div>`;
   initMedia(p);
-  initStages(p);
-  renderLivePreview(p);
   $('#saveProd').onclick = () => saveProduct(p, edit);
-  ['fMotif', 'fHue1', 'fHue2'].forEach(id => { const el = $('#' + id); if (el) el.addEventListener('change', () => renderLivePreview(p)); });
 }
 function fileRowHtml(m, i, pid) {
   return `<div class="file-row"><div class="fico">${(m.name || 'FILE').split('.').pop().toUpperCase().slice(0, 4)}</div><div><div class="fname">${esc(m.name)}</div><div class="fmeta">${fmt(m.size || 0)} bytes · ${m.type || 'file'}</div></div><div class="factions"><button class="btn btn-ic btn-danger" data-mdel="${i}" data-pid="${pid}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div>`;
@@ -582,17 +567,17 @@ function saveProduct(p, edit) {
   if (!name || !code) { toast('Design name and code are required', 'danger'); return; }
   const formats = $$('#fmtWrap .fmt-chip.on').map(el => el.dataset.raw);
   const coll = $$('#collWrap input:checked').map(i => i.value);
-  const tags = $('#fTags').value.split(',').map(s => s.trim()).filter(Boolean);
   const data = {
     name: name, code: code, price: Number($('#fPrice').value) || 0,
     sale: $('#fSale').value !== '' ? Number($('#fSale').value) : null,
     free: $('#fFree').checked, featured: $('#fFeatured').checked,
-    cat: $('#fCat').value, sub: $('#fSub').value, motif: $('#fMotif').value, status: $('#fStatus').value,
-    stitches: Number($('#fStitches').value) || 0, w: Number($('#fW').value) || 100, h: Number($('#fH').value) || 120,
-    colors: Number($('#fColors').value) || 1, hoop: $('#fHoop').value.trim() || '5 × 7"',
-    hue1: $('#fHue1').value, hue2: $('#fHue2').value, tags, desc: $('#fDesc').value.trim(),
-    formats: formats.length ? formats : ['DST', 'PES', 'JEF', 'EXP'], coll: coll,
-    fab: p.fab || 'cream', media: p.media || []
+    cat: $('#fCat').value,
+    stitches: Number($('#fStitches').value) || 0,
+    colors: Number($('#fColors').value) || 1,
+    desc: $('#fDesc').value.trim(),
+    formats: formats.length ? formats : ['DST', 'PES', 'JEF', 'EXP'],
+    coll: coll,
+    media: p.media || []
   };
   if (edit) {
     Object.assign(p, data);
