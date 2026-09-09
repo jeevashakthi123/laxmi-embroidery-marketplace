@@ -635,63 +635,67 @@ function renderDetail(id) {
 
   $('#app').innerHTML = `
   <section class="section">
-    <div class="container">
-      <div class="crumbs" style="margin-bottom:20px"><a href="#/">Home</a><span class="sep">/</span><a href="#/shop">Shop</a><span class="sep">/</span><a href="#/shop?cat=${p.cat}">${esc(catName(p.cat))}</a><span class="sep">/</span><span>${esc(p.name)}</span></div>
-      <div class="detail-layout">
-        <div>
-          <div class="viewer">
-            <div class="viewer-stage shown" id="vstage">
-              <div class="art" id="vart" style="padding:26px">${MP.motifArtwork(p, 'cream', 500, { code: false })}</div>
-            </div>
-            <div class="viewer-tools">
-              <button class="stool" data-vzoom="-1" title="Zoom out">−</button>
-              <button class="stool" data-vzoom="1" title="Zoom in">+</button>
-              <button class="stool" data-vfit title="Fit to screen">⊡</button>
-              <span class="sep-tool"></span>
-              <button class="stool" data-vrot title="Rotate">⟳</button>
-              <button class="stool" data-vreset title="Reset">↺</button>
-              <span class="sep-tool"></span>
-              <button class="stool" data-vgrid title="Grid overlay">▦</button>
-              <button class="stool" data-vfull title="Fullscreen">⛶</button>
-              <div class="fabric-picker" id="fabricPicker">
-                ${Object.keys(MP.FABRICS).map(f => `<button class="fabric-swatch ${f === 'cream' ? 'active' : ''}" data-fab="${f}" style="background:${MP.FABRICS[f]}" title="${f}"></button>`).join('')}
-              </div>
+    <div class="container detail-page-container">
+      <!-- Viewer first in source order for mobile -->
+      <div class="viewer-wrapper">
+        <div class="viewer">
+          <div class="viewer-stage shown" id="vstage">
+            <div class="art" id="vart" style="padding:26px">${MP.motifArtwork(p, 'cream', 500, { code: false })}</div>
+          </div>
+          <div class="viewer-tools">
+            <button class="stool" data-vzoom="-1" title="Zoom out">−</button>
+            <button class="stool" data-vzoom="1" title="Zoom in">+</button>
+            <button class="stool" data-vfit title="Fit to screen">⊡</button>
+            <span class="sep-tool"></span>
+            <button class="stool" data-vrot title="Rotate">⟳</button>
+            <button class="stool" data-vreset title="Reset">↺</button>
+            <span class="sep-tool"></span>
+            <button class="stool" data-vgrid title="Grid overlay">▦</button>
+            <button class="stool" data-vfull title="Fullscreen">⛶</button>
+            <div class="fabric-picker" id="fabricPicker">
+              ${Object.keys(MP.FABRICS).map(f => `<button class="fabric-swatch ${f === 'cream' ? 'active' : ''}" data-fab="${f}" style="background:${MP.FABRICS[f]}" title="${f}"></button>`).join('')}
             </div>
           </div>
         </div>
-        <div class="detail-info">
-          <span class="eyebrow">${esc(catName(p.cat))}${p.sub && p.sub !== p.cat ? ' · ' + esc(catName(p.sub)) : ''} · ${esc(p.code)}</span>
-          <h1>${esc(p.name)}</h1>
-          <div class="rating-line">
-            <span class="stars">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5 - Math.round(p.rating))}</span>
-            <b style="color:var(--text)">${p.rating.toFixed(1)}</b> · ${p.reviews} reviews · <b style="color:#3f8c6a">${fmt(p.sales)} sold</b>
-          </div>
-          <div class="price-line">
-            <span class="now">${price ? INR(price) : 'FREE'}</span>
-            ${was ? `<span class="was">${INR(was)}</span>` : ''}
-            ${was ? `<span class="save">SAVE ${save}%</span>` : ''}
-            ${p.free ? '<span class="save" style="background:#3f8c6a">FREE DOWNLOAD</span>' : ''}
-          </div>
-          <p class="detail-desc">${esc(p.desc)}</p>
-          <div class="key-chips">
-            <span class="kchip"><i>${fmt(p.stitches)}</i>&nbsp; stitches</span>
-            <span class="kchip"><i>${p.w} × ${p.h}</i>&nbsp; mm</span>
-            <span class="kchip"><i>${p.colors}</i>&nbsp; colors</span>
-            <span class="kchip">Hoop&nbsp;<b>${p.hoop}</b></span>
-            ${(p.formats || []).map(f => `<span class="kchip"><i>${f}</i></span>`).join('')}
-          </div>
-          <div class="qty-row">
-            <div class="qty"><button data-qminus>−</button><span id="qty">${inCart?.qty || 1}</span><button data-qplus>+</button></div>
-            <span class="note">Per design package (all formats included)</span>
-          </div>
-          <div class="detail-cta">
-            <button class="btn btn-gold" data-add="${p.id}" data-buynow id="detailAdd">${price ? 'Add to Cart · ' + INR(price * (inCart?.qty || 1)) : 'Download Free'}</button>
-            <button class="btn btn-dark" data-add="${p.id}" data-buynow data-qty="${inCart?.qty || 1}" id="detailBuy">Buy Now</button>
-            <button class="btn btn-ghost" data-wish="${p.id}" id="detailWish">${wish.includes(p.id) ? '♥ In Wishlist' : '♡ Add to Wishlist'}</button>
-          </div>
-          <div class="secure-note">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5Z"/><path d="m9 12 2 2 4-4"/></svg>
-            Instant delivery after payment · 128-bit secure checkout · Download unlimited times
+
+      <div class="detail-content-wrapper">
+        <div class="crumbs" style="margin-bottom:20px"><a href="#/">Home</a><span class="sep">/</span><a href="#/shop">Shop</a><span class="sep">/</span><a href="#/shop?cat=${p.cat}">${esc(catName(p.cat))}</a><span class="sep">/</span><span>${esc(p.name)}</span></div>
+        
+        <div class="detail-layout">
+          <div class="detail-info">
+            <span class="eyebrow">${esc(catName(p.cat))}${p.sub && p.sub !== p.cat ? ' · ' + esc(catName(p.sub)) : ''} · ${esc(p.code)}</span>
+            <h1>${esc(p.name)}</h1>
+            <div class="rating-line">
+              <span class="stars">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5 - Math.round(p.rating))}</span>
+              <b style="color:var(--text)">${p.rating.toFixed(1)}</b> · ${p.reviews} reviews · <b style="color:#3f8c6a">${fmt(p.sales)} sold</b>
+            </div>
+            <div class="price-line">
+              <span class="now">${price ? INR(price) : 'FREE'}</span>
+              ${was ? `<span class="was">${INR(was)}</span>` : ''}
+              ${was ? `<span class="save">SAVE ${save}%</span>` : ''}
+              ${p.free ? '<span class="save" style="background:#3f8c6a">FREE DOWNLOAD</span>' : ''}
+            </div>
+            <p class="detail-desc">${esc(p.desc)}</p>
+            <div class="key-chips">
+              <span class="kchip"><i>${fmt(p.stitches)}</i>&nbsp; stitches</span>
+              <span class="kchip"><i>${p.w} × ${p.h}</i>&nbsp; mm</span>
+              <span class="kchip"><i>${p.colors}</i>&nbsp; colors</span>
+              <span class="kchip">Hoop&nbsp;<b>${p.hoop}</b></span>
+              ${(p.formats || []).map(f => `<span class="kchip"><i>${f}</i></span>`).join('')}
+            </div>
+            <div class="qty-row">
+              <div class="qty"><button data-qminus>−</button><span id="qty">${inCart?.qty || 1}</span><button data-qplus>+</button></div>
+              <span class="note">Per design package (all formats included)</span>
+            </div>
+            <div class="detail-cta">
+              <button class="btn btn-gold" data-add="${p.id}" data-buynow id="detailAdd">${price ? 'Add to Cart · ' + INR(price * (inCart?.qty || 1)) : 'Download Free'}</button>
+              <button class="btn btn-dark" data-add="${p.id}" data-buynow data-qty="${inCart?.qty || 1}" id="detailBuy">Buy Now</button>
+              <button class="btn btn-ghost" data-wish="${p.id}" id="detailWish">${wish.includes(p.id) ? '♥ In Wishlist' : '♡ Add to Wishlist'}</button>
+            </div>
+            <div class="secure-note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5Z"/><path d="m9 12 2 2 4-4"/></svg>
+              Instant delivery after payment · 128-bit secure checkout · Download unlimited times
+            </div>
           </div>
         </div>
       </div>

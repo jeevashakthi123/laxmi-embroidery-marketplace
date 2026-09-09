@@ -398,6 +398,9 @@ h1,h2,h3,h4 { font-family: var(--serif); font-weight: 600; line-height: 1.15; le
 .filters-reset { font-size: .78rem; color: var(--maroon); text-decoration: underline; cursor: pointer; margin-top: 8px; }
 
 /* ---------- Product detail ---------- */
+.detail-page-container { display: grid; gap: 0; }
+.viewer-wrapper { order: 1; }
+.detail-content-wrapper { order: 2; }
 .detail-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; align-items: start; }
 .viewer { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; position: sticky; top: 96px; }
 .viewer-stage { position: relative; aspect-ratio: 1/1.05; overflow: hidden; background: var(--cream); }
@@ -411,7 +414,7 @@ h1,h2,h3,h4 { font-family: var(--serif); font-weight: 600; line-height: 1.15; le
 .fabric-picker { display: flex; gap: 7px; margin-left: auto; }
 .fabric-swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--border); cursor: pointer; transition: transform .2s; }
 .fabric-swatch:hover { transform: scale(1.15); }
-.fabric-swatch.active { box-shadow: 0 0 0 2px var(--gold); }
+.fabric-swatch.active { box-shadow: 0 0 0 2px var(--pink); }
 @keyframes stitchIn { from { opacity: 0; transform: scale(.92);} to { opacity:1; transform: scale(1);} }
 
 .detail-info h1 { font-size: clamp(1.8rem, 3vw, 2.5rem); margin-bottom: 10px; }
@@ -592,6 +595,9 @@ table.orders tr:hover td { background: #faf8f3; }
   .hero-stage { display: none; }
   .footer-top .container { grid-template-columns: 1fr 1fr; }
   .detail-layout, .shop-layout, .cart-layout, .acc-layout, .auth-wrap { grid-template-columns: 1fr; }
+  .detail-page-container { display: flex; flex-direction: column; }
+  .viewer-wrapper { order: 1; }
+  .detail-content-wrapper { order: 2; }
   .viewer { position: static; }
   .filters { position: static; }
   .nav { position: fixed; inset: 0; background: var(--black); flex-direction: column; align-items: center; justify-content: center; gap: 34px; font-size: 1.3rem; color: #fff; z-index: 90; display: none; }
@@ -623,6 +629,11 @@ table.orders tr:hover td { background: #faf8f3; }
   body { padding-bottom: 128px; }
   .mobile-contact-bar { display: block !important; }
   .brand-contact { display: none !important; }
+  .detail-page-container { flex-direction: column; }
+  .viewer-wrapper { order: 1; margin-bottom: 16px; }
+  .detail-content-wrapper { order: 2; }
+  .crumbs { margin-bottom: 16px; padding: 0 16px; }
+  .detail-layout { gap: 24px; }
 }
 
 /* ---------- Reveal on scroll ---------- */
