@@ -215,6 +215,6 @@ const COLL_ART = { floral: 'floral', bridal: 'bridal', leaf: 'leaf', mandala: 'm
     return motifArtwork({ code: '', motif: COLL_ART[(c && c.img) || 'motif'] || 'butta', hue1: 'gold', hue2: 'maroon' }, 'black', 420, { code: false });
   }
 
-  return { FABRICS, THREAD, motifArtwork, catArt, collArt };
+  return { FABRICS, THREAD, motifArtwork, catArt, collArt, CAT_MOTIF };
 })();
 if (typeof window !== 'undefined') window.MP = MP;

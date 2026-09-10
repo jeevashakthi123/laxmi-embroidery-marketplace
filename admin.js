@@ -490,7 +490,7 @@ function renderProductForm(idOrNull) {
     <div class="stack">
       <div class="card"><h3>Preview <span class="chip pill gold">procedural</span></h3>
         <p class="section-s" style="margin-bottom:12px">Preview regenerates from category.</p>
-        <div class="preview-stages" id="stages">${Object.keys(MP.FABRICS).map(f => `<div class="pstage" data-fab="${f}" style="background:${f === 'black' || f === 'maroon' || f === 'green' || f === 'navy' ? '#191613' : '#f3ecdb'}"><div class="art">${MP.motifArtwork({...p, motif: CAT_MOTIF[p.cat] || 'floral'}, f, 120, { code: false })}</div><span class="pm">${f}</span></div>`).join('')}</div>
+        <div class="preview-stages" id="stages">${Object.keys(MP.FABRICS).map(f => `<div class="pstage" data-fab="${f}" style="background:${f === 'black' || f === 'maroon' || f === 'green' || f === 'navy' ? '#191613' : '#f3ecdb'}"><div class="art">${MP.motifArtwork({...p, motif: MP.CAT_MOTIF[p.cat] || 'floral'}, f, 120, { code: false })}</div><span class="pm">${f}</span></div>`).join('')}</div>
         <p class="section-s" style="margin:12px 0 6px;font-size:.74rem;color:var(--dim)">Tip: dense motifs read best on black/cream backgrounds.</p>
       </div>
       <div class="card" style="position:sticky;top:82px">
