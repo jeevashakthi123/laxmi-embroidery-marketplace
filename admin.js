@@ -476,9 +476,8 @@ function renderProductForm(idOrNull) {
         </div>
       </div>
       <div class="card"><h3>Technical</h3>
-        <div class="grid4">
-          <div class="field"><label>Model Number (Code) <b>*</b></label><input id="fCode" value="${esc(p.code)}" placeholder="e.g. LE025" ${edit ? 'readonly style="opacity:.5"' : ''}></div>
-          <div class="field"><label>Design Name <b>*</b></label><input id="fName" value="${esc(p.name)}" placeholder="e.g. Royal Floral Neckline"></div>
+        <div class="grid3">
+          <div class="field"><label>Category <b>*</b></label><select id="fCat">${catOpts}</select></div>
           <div class="field"><label>Stitch Count <b>*</b></label><input id="fStitches" type="number" min="0" value="${p.stitches ?? 0}"></div>
           <div class="field"><label>Colours <b>*</b></label><input id="fColors" type="number" min="1" max="30" value="${p.colors ?? 5}"></div>
         </div>
