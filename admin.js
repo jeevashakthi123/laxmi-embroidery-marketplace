@@ -466,6 +466,14 @@ function renderProductForm(idOrNull) {
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="fFree" ${p.free ? 'checked' : ''}> Free download</label>
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="fFeatured" ${p.featured ? 'checked' : ''}> Featured on home</label>
         </div>
+        <div class="field" style="margin-top:8px"><label>Cover Image</label>
+          <div class="drop" id="coverDrop" style="padding:16px">
+            <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div>
+            <b>Drop cover image here</b><p>PNG, JPG, WebP — used as product thumbnail.</p>
+          </div>
+          <input type="file" id="coverInput" accept="image/*" style="display:none">
+          <div id="coverPreview" style="margin-top:8px;display:${p.cover ? 'block' : 'none'}"><img id="coverImg" src="${p.cover || ''}" style="max-width:120px;border-radius:8px;border:1px solid var(--border)"><button type="button" class="btn btn-ic btn-danger" id="coverRemove" style="margin-left:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+        </div>
       </div>
       <div class="card"><h3>Technical</h3>
         <div class="grid4">
@@ -534,6 +542,44 @@ function initMedia(p) {
   drop.ondragleave = () => drop.classList.remove('over');
   drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove('over'); handleFiles(e.dataTransfer.files, p); };
   input.onchange = () => { handleFiles(input.files, p); input.value = ''; };
+
+  // Cover image upload
+  const coverDrop = $('#coverDrop');
+  const coverInput = $('#coverInput');
+  const coverPreview = $('#coverPreview');
+  const coverImg = $('#coverImg');
+  const coverRemove = $('#coverRemove');
+  if (coverDrop && coverInput) {
+    coverDrop.onclick = () => coverInput.click();
+    coverDrop.ondragover = (e) => { e.preventDefault(); coverDrop.classList.add('over'); };
+    coverDrop.ondragleave = () => coverDrop.classList.remove('over');
+    coverDrop.ondrop = (e) => { e.preventDefault(); coverDrop.classList.remove('over'); handleCoverImage(e.dataTransfer.files, p); };
+    coverInput.onchange = () => { handleCoverImage(coverInput.files, p); coverInput.value = ''; };
+  }
+  if (coverRemove) {
+    coverRemove.onclick = () => {
+      p.cover = null;
+      coverPreview.style.display = 'none';
+      coverImg.src = '';
+      toast('Cover image removed', 'ok');
+    };
+  }
+}
+function handleCoverImage(files, p) {
+  const file = files[0];
+  if (!file || !file.type.startsWith('image/')) { toast('Please select an image file', 'danger'); return; }
+  const r = new FileReader();
+  r.onload = () => {
+    p.cover = r.result;
+    const coverPreview = $('#coverPreview');
+    const coverImg = $('#coverImg');
+    if (coverPreview && coverImg) {
+      coverImg.src = r.result;
+      coverPreview.style.display = 'block';
+    }
+    toast('Cover image uploaded', 'ok');
+  };
+  r.readAsDataURL(file);
 }
 function handleFiles(files, p) {
   const keep = [(p.media || []).slice()];
@@ -578,7 +624,8 @@ function saveProduct(p, edit) {
     desc: $('#fDesc').value.trim(),
     formats: formats.length ? formats : ['DST', 'PES', 'JEF', 'EXP'],
     coll: coll,
-    media: p.media || []
+    media: p.media || [],
+    cover: p.cover || null
   };
   if (edit) {
     Object.assign(p, data);
