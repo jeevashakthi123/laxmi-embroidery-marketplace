@@ -481,7 +481,7 @@ function renderProductForm(idOrNull) {
       <div class="card"><h3>Media <span class="chip pill blue" style="font-size:.66rem">optional uploads</span></h3>
         <div class="drop" id="drop">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div>
-          <b>Drop embroidery files here</b><p>DST, PES, JEF, EXP or preview images — store up to 4 files.</p>
+          <b>Drop embroidery files here</b><p>DST, PES, JEF, EXP or preview images — store up to 25 files.</p>
           <div class="fmts"><i>DST</i><i>PES</i><i>JEF</i><i>EXP</i><i>PNG</i><i>SVG</i></div>
         </div>
         <div class="file-list" id="fileList">${fileRows}</div>
@@ -537,7 +537,7 @@ function initMedia(p) {
 }
 function handleFiles(files, p) {
   const keep = [(p.media || []).slice()];
-  const arr = [...files].filter(f => /\.(dst|pes|jef|exp|png|jpg|jpeg|svg|webp)$/i.test(f.name)).slice(0, 4 - keep[0].length);
+  const arr = [...files].filter(f => /\.(dst|pes|jef|exp|png|jpg|jpeg|svg|webp)$/i.test(f.name)).slice(0, 25 - keep[0].length);
   if (!arr.length) { toast('No supported files in selection', 'danger'); return; }
   let done = 0;
   arr.forEach(f => {
