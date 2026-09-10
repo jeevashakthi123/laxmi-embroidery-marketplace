@@ -510,7 +510,10 @@ function renderProductForm(idOrNull) {
     </div>
   </div>`;
   initMedia(p);
-  $('#saveProd').onclick = () => saveProduct(p, edit);
+  $('#saveProd').onclick = (e) => {
+    e.preventDefault();
+    try { saveProduct(p, edit); } catch (err) { console.error(err); toast('Error: ' + err.message, 'danger'); }
+  };
 }
 function fileRowHtml(m, i, pid) {
   return `<div class="file-row"><div class="fico">${(m.name || 'FILE').split('.').pop().toUpperCase().slice(0, 4)}</div><div><div class="fname">${esc(m.name)}</div><div class="fmeta">${fmt(m.size || 0)} bytes · ${m.type || 'file'}</div></div><div class="factions"><button class="btn btn-ic btn-danger" data-mdel="${i}" data-pid="${pid}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div>`;
