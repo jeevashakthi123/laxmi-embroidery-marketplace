@@ -461,10 +461,13 @@ function productCard(p) {
     (p.sale ? '<span style="background:var(--maroon);color:#fff">Sale</span>' : (p.featured ? '<span style="background:var(--black);color:#fff">Featured</span>' : ''));
   const was = p.sale ? `<span class="was">${INR(p.price)}</span>` : '';
   const inWish = wish.includes(p.id);
+  const thumb = p.cover 
+    ? `<img src="${p.cover}" alt="${esc(p.name)}" style="width:100%;height:100%;object-fit:cover">`
+    : MP.motifArtwork(p, 'cream', 420);
   return `
   <article class="pcard reveal in">
     <div class="thumb">
-      <div class="art">${MP.motifArtwork(p, 'cream', 420)}</div>
+      <div class="art">${thumb}</div>
       <div class="flag">${flag}</div>
       <button class="wish ${inWish ? 'on' : ''}" data-wish="${p.id}" aria-label="Wishlist" title="Wishlist">
         <svg viewBox="0 0 24 24" fill="${inWish ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.8l-1-1.2a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
@@ -640,7 +643,7 @@ function renderDetail(id) {
       <div class="viewer-wrapper">
         <div class="viewer">
           <div class="viewer-stage shown" id="vstage">
-            <div class="art" id="vart" style="padding:26px">${MP.motifArtwork(p, 'cream', 500, { code: false })}</div>
+            <div class="art" id="vart" style="padding:26px">${p.cover ? `<img src="${p.cover}" alt="${esc(p.name)}" style="width:100%;height:100%;object-fit:cover">` : MP.motifArtwork(p, 'cream', 500, { code: false })}</div>
           </div>
           <div class="viewer-tools">
             <button class="stool" data-vzoom="-1" title="Zoom out">−</button>
