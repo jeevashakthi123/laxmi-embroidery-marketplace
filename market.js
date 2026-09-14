@@ -719,7 +719,7 @@ function renderDetail(id) {
           </div>
           <h2 style="margin:34px 0 14px">Design Specifications</h2>
           <table class="spec-table">
-            ${[['Stitch Count', fmt(p.stitches) + ' stitches'], ['Design Width', p.w + ' mm'], ['Design Height', p.h + ' mm'], ['Color Changes', p.colors], ['File Formats', (p.formats || []).join(', ')], ['Recommended Hoop', p.hoop], ['Max Stitch Length', '3.0 mm'], ['Design Code', esc(designCode(p))]].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
+            ${[['Model Number', esc(p.code)], ['Design Name', esc(p.name)], ['Stitch Count', fmt(p.stitches) + ' stitches'], ['Colours', p.colors]].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
           </table>
         </div>
         <div>
