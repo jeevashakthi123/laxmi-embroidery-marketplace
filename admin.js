@@ -482,6 +482,7 @@ function renderProductForm(idOrNull) {
           <div class="field"><label>Stitch Count <b>*</b></label><input id="fStitches" type="number" min="0" value="${p.stitches ?? 0}"></div>
           <div class="field"><label>Colours <b>*</b></label><input id="fColors" type="number" min="1" max="30" value="${p.colors ?? 5}"></div>
         </div>
+        <div class="field"><label>Category <b>*</b></label><select id="fCat">${catOpts}</select></div>
         <div class="field" style="margin-bottom:0"><label>Description</label><textarea id="fDesc" rows="4" placeholder="Describe the design…">${esc(p.desc || '')}</textarea></div>
       </div>
       <div class="card"><h3>Formats</h3><div class="formats-toggle" id="fmtWrap">${['DST', 'PES', 'JEF', 'EXP'].map(f => `<span class="fmt-chip ${(p.formats || []).includes(f) ? 'on' : ''}" data-raw="${f}">${f}</span>`).join('')}</div></div>
