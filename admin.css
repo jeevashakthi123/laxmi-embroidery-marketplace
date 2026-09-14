@@ -128,13 +128,20 @@ svg { display: block; }
 .range-tabs button.active { background: var(--gold-soft); color: var(--gold-hi); }
 
 /* ---------- Tables ---------- */
-.table-wrap { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-table.tbl { width: 100%; border-collapse: collapse; font-size: .86rem; }
+.table-wrap { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; }
+table.tbl { width: 100%; border-collapse: collapse; font-size: .86rem; table-layout: fixed; }
 table.tbl th { text-align: left; font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); font-weight: 700; padding: 13px 16px; border-bottom: 1px solid var(--line); background: var(--bg-2); }
 table.tbl td { padding: 13px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
 table.tbl tr:last-child td { border-bottom: none; }
 table.tbl tr:hover td { background: #ffffff06; }
 table.tbl td.shrink, table.tbl th.shrink { width: 1%; white-space: nowrap; }
+table.tbl th:nth-child(1) { width: 30%; }
+table.tbl th:nth-child(2) { width: 15%; }
+table.tbl th:nth-child(3) { width: 12%; }
+table.tbl th:nth-child(4) { width: 12%; }
+table.tbl th:nth-child(5) { width: 10%; }
+table.tbl th:nth-child(6) { width: 10%; }
+table.tbl th:nth-child(7) { width: 11%; }
 .pill { display: inline-flex; align-items: center; gap: 6px; font-size: .7rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 4px 11px; border-radius: 999px; }
 .pill.green,.pill.paid,.pill.completed,.pill.done { background: rgba(63,140,106,.15); color: #5fbf96; }
 .pill.gold,.pill.pending { background: rgba(201,162,39,.16); color: var(--gold-hi); }
