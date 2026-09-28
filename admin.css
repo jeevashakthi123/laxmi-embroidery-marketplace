@@ -82,7 +82,7 @@ svg { display: block; }
 .content { padding: 30px; }
 
 /* ---------- Buttons ---------- */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 11px 20px; border-radius: 10px; font-weight: 700; font-size: .87rem; transition: all .22s var(--ease); border: 1px solid transparent; white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 11px 20px; border-radius: 10px; font-weight: 700; font-size: .87rem; transition: all .22s var(--ease); border: 1px solid transparent; white-space: nowrap; min-height: 48px; min-width: 48px; touch-action: manipulation; }
 .btn-gold { background: linear-gradient(135deg, var(--gold-hi), var(--gold)); color: #171717; }
 .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 8px 26px rgba(201,162,39,.3); }
 .btn-dark { background: #ffffff10; border-color: var(--line); }
@@ -91,10 +91,16 @@ svg { display: block; }
 .btn-outline:hover { background: var(--gold-soft); }
 .btn-danger { background: rgba(194,84,84,.12); color: var(--red); border-color: rgba(194,84,84,.3); }
 .btn-danger:hover { background: rgba(194,84,84,.2); }
-.btn-sm { padding: 8px 14px; font-size: .78rem; border-radius: 8px; }
+.btn-sm { padding: 8px 14px; font-size: .78rem; border-radius: 8px; min-height: 40px; min-width: 40px; }
 .btn-block { width: 100%; }
-.btn-ic { padding: 8px; }
+.btn-ic { padding: 8px; min-height: 40px; min-width: 40px; }
 .btn svg { width: 15px; height: 15px; }
+
+@media (max-width: 640px) {
+  .btn { padding: 14px 24px; font-size: 1rem; min-height: 52px; }
+  .btn-sm { padding: 10px 16px; font-size: .85rem; min-height: 44px; min-width: 44px; }
+  .btn-ic { min-height: 44px; min-width: 44px; }
+}
 .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
 .toolbar .spacer { flex: 1; }
 .search-in { position: relative; }
